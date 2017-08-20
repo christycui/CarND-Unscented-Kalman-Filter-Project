@@ -126,7 +126,6 @@ void UKF::ProcessMeasurement(MeasurementPackage measurement_pack) {
     
     float delta_t = (measurement_pack.timestamp_ - time_us_) / 1000000.0;	//dt - expressed in seconds
     time_us_ = measurement_pack.timestamp_;
-    cout << "delta_t: " << delta_t << endl;
     
     cout << "starting prediction!" << endl;
     
@@ -169,6 +168,7 @@ void UKF::Prediction(double delta_t) {
     MatrixXd P_aug = MatrixXd(n_aug_, n_aug_);
     P_aug.fill(0.0);
     VectorXd x_aug = VectorXd(n_aug_);
+    x_aug.fill(0.0);
     
     //create sigma point matrix
     MatrixXd Xsig_aug = MatrixXd(n_aug_, 2 * n_aug_ + 1);
@@ -176,7 +176,6 @@ void UKF::Prediction(double delta_t) {
     
     //create augmented mean state
     x_aug.head(5) = x_;
-    cout << "x_aug: " << x_aug << endl;
     Xsig_aug.col(0) = x_aug;
     //create augmented covariance matrix
     P_aug.topLeftCorner(5, 5) = P_;
@@ -185,15 +184,12 @@ void UKF::Prediction(double delta_t) {
     Q << std_a_*std_a_, 0,
     0, std_yawdd_*std_yawdd_;
     P_aug.bottomRightCorner(2, 2) = Q;
-    cout << "P_aug: " << P_aug << endl;
 
     MatrixXd A = P_aug.llt().matrixL();
-    cout << "A: " << A << endl;
     for (int i=0; i<n_aug_; i++) {
         Xsig_aug.col(i+1) = x_aug + sqrt(lambda_+n_aug_)*A.col(i);
         Xsig_aug.col(i+1+n_aug_) = x_aug - sqrt(lambda_ + n_aug_)*A.col(i);
     }
-    cout << "Xsig_aug: " << Xsig_aug << endl;
 
     for (int i = 0; i< 2*n_aug_+1; i++)
     {
@@ -238,7 +234,6 @@ void UKF::Prediction(double delta_t) {
         Xsig_pred_(3,i) = yaw_p;
         Xsig_pred_(4,i) = yawd_p;
     }
-    cout << "Xsig_pred_: " << Xsig_pred_ << endl;
     
     // final predictions
     //set weights
@@ -246,7 +241,6 @@ void UKF::Prediction(double delta_t) {
     for (int i=1; i<2*n_aug_+1; i++) {
         weights_(i) = 0.5/(lambda_ + n_aug_);
     }
-    cout << "weights_" << weights_ << endl;
     
     //predict state mean
     x_.fill(0.0);
