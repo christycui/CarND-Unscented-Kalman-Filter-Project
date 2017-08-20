@@ -126,7 +126,12 @@ int main()
     	  estimate(3) = v2;
     	  
     	  estimations.push_back(estimate);
-
+          /*
+          // output the NIS
+          cout << "NIS: " << endl;
+          ukf.NIS_lidar_ << "\t";
+          ukf.NIS_radar_ << "\n";
+           */
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
 
           json msgJson;
